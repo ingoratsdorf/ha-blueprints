@@ -74,10 +74,10 @@ action:
               entity_id: !input climate_entity
     default:
       # We can only chnage temperatures on heaters if they are on, THANKS, TUYA
-      - service: "{{ switch.turn_on }}"
+      - service: switch.turn_on
         data: {}
         target:
-          entity_id: heater_switch
+          entity_id: "{{ heater_switch }}"
       - service: number.set_value
         data:
           value: "{{ state_attr(climate_entity, 'temperature') | int }}"
