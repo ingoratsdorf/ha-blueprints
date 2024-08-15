@@ -18,7 +18,6 @@ blueprint:
       selector:
         entity:
           domain: number
-          device_class: temperature
 
 variables:
   climate_entity: !input climate_entity
@@ -83,4 +82,3 @@ action:
           value: "{{ state_attr(climate_entity, 'temperature') | int }}"
         target:
           entity_id: !input heater_temperature
-      
