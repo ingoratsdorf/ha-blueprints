@@ -1,0 +1,86 @@
+blueprint:
+  name: Tuya Heater synchronisation blueprint
+  description: Synchronises heater settings across the Tuya entities and the smart thermostat
+  source_url: https://github.com/ingoratsdorf/ha-blueprints/blob/master/home_heater_tuya_sync.yaml
+  domain: automation
+
+
+  input:
+    climate_entity:
+      name: Thermostat
+      description: Which Thermostat should be synchronised?
+      selector:
+        entity:
+          domain: climate
+    heater_temperature:
+      name: Heater Temperature state
+      description: Temperature of heater to synchronise
+      selector:
+        entity:
+          domain: number
+          device_class: temperature
+
+variables:
+  climate_entity: !input climate_entity
+  heater_temperature: !input heater_temperature
+  heater_switch: "{{ state_attr(climate_entity,'underlying_switch_0') }}"
+
+mode: single
+trigger:
+  # Trigger upon thermostat contral temperature change
+  - platform: state
+    entity_id:
+      - !input climate_entity #climate.ingo_s_office_heater_thermostat
+    attribute: temperature
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 1
+    id: update_heater
+  # Trigger upon heater temperature control change
+  - platform: state
+    entity_id:
+      - !input heater_temperature #number.ingo_s_office_heater_temperature
+    id: update_climate
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 1
+  # Trigger when HA is loaded
+  - platform: homeassistant
+    event: start
+    id: update_heater
+  # Trigger when 
+  - platform: event
+    event_type: automation_reloaded
+    id: update_heater
+condition:
+  - condition: template
+    value_template: >-
+      {{
+      (state_attr(climate_entity,'temperature')|int)
+      != (states(heater_temperature)|int) }}
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - update_climate
+        sequence:
+          - service: climate.set_temperature
+            data:
+              temperature: "{{ states(heater_temperature) | int }}"
+            target:
+              entity_id: !input climate_entity
+    default:
+      # We can only chnage temperatures on heaters if they are on, THANKS, TUYA
+      - service: "{{ switch.turn_on }}"
+        data: {}
+        target:
+          entity_id: heater_switch
+      - service: number.set_value
+        data:
+          value: "{{ state_attr(climate_entity, 'temperature') | int }}"
+        target:
+          entity_id: !input heater_temperature
+      
