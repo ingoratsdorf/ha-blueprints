@@ -1,7 +1,7 @@
 blueprint:
   name: Tuya Heater synchronisation blueprint
   description: Synchronises heater settings across the Tuya entities and the smart thermostat
-  source_url: https://github.com/ingoratsdorf/ha-blueprints/blob/master/home_heater_tuya_sync.yaml
+  source_url: https://github.com/ingoratsdorf/ha-blueprints/raw/main/home_heater_tuya_sync.yaml
   domain: automation
 
 
