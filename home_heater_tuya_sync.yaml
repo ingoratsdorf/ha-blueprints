@@ -72,12 +72,18 @@ condition:
       {{
       (state_attr(climate_entity,'temperature')|int)
       != (states(heater_temperature)|int) }}
-action:
+actions:
   - choose:
       - conditions:
-          - condition: trigger
-            id:
-              - update_climate
+          - condition: and
+            conditions:
+              - condition: trigger
+                id:
+                  - update_climate
+              - condition: template
+                value_template: >-
+                  {{ trigger.from_state.state != 'unavailable' &&
+                  trigger.from_state.state != 'unknown' }}
         sequence:
           - service: climate.set_temperature
             data:
