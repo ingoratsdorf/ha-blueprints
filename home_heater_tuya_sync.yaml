@@ -36,15 +36,28 @@ trigger:
       minutes: 0
       seconds: 1
     id: update_heater
+  
   # Trigger upon heater temperature control change
   - platform: state
     entity_id:
-      - !input heater_temperature #number.ingo_s_office_heater_temperature
+      - !input heater_temperature
     id: update_climate
     for:
       hours: 0
       minutes: 0
       seconds: 1
+  # Bugfix: Prevents updating the climate when the heter goes offline etc
+  - entity_id:
+      - !input heater_temperature
+    id: update_heater
+    trigger: state
+    from: unavailable
+  - entity_id:
+      - !input heater_temperature
+    id: update_heater
+    trigger: state
+    from: unknown
+
   # Trigger when HA is loaded
   - platform: homeassistant
     event: start
@@ -72,7 +85,7 @@ action:
             target:
               entity_id: !input climate_entity
     default:
-      # We can only chnage temperatures on heaters if they are on, THANKS, TUYA
+      # We can only change temperatures on heaters if they are on, THANKS, TUYA
       - service: switch.turn_on
         data: {}
         target:
