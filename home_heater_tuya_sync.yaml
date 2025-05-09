@@ -69,10 +69,8 @@ trigger:
 condition:
   - condition: template
     value_template: >-
-      {{
-      (state_attr(climate_entity,'temperature')|int)
-      != (states(heater_temperature)|int) }}
-actions:
+       {{ ( (state_attr(climate_entity,'temperature')|int) != (states(heater_temperature)|int) ) and trigger.from_state.state != 'unavailable' and trigger.from_state.state != 'unknown' }}
+action:
   - choose:
       - conditions:
           - condition: and
@@ -82,8 +80,7 @@ actions:
                   - update_climate
               - condition: template
                 value_template: >-
-                  {{ trigger.from_state.state != 'unavailable' &&
-                  trigger.from_state.state != 'unknown' }}
+                  {{ trigger.from_state.state != 'unavailable' and trigger.from_state.state != 'unknown' }}
         sequence:
           - service: climate.set_temperature
             data:
