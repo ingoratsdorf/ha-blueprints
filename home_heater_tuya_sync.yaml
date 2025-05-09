@@ -69,7 +69,7 @@ trigger:
 condition:
   - condition: template
     value_template: >-
-       {{ ( (state_attr(climate_entity,'temperature')|int) != (states(heater_temperature)|int) ) and trigger.from_state.state != 'unavailable' and trigger.from_state.state != 'unknown' }}
+       {{ (state_attr(climate_entity,'temperature')|int) != (states(heater_temperature)|int) }}
 action:
   - choose:
       - conditions:
