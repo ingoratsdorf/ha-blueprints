@@ -46,7 +46,8 @@ trigger:
       hours: 0
       minutes: 0
       seconds: 1
-  # Bugfix: Prevents updating the climate when the heter goes offline etc
+      
+  # Bugfix: Prevents updating the climate when the heater goes offline etc
   - entity_id:
       - !input heater_temperature
     id: update_heater
